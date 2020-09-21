@@ -1,0 +1,136 @@
+;
+; Name: spritemulti.z
+; Description: Simple sprite movement
+;
+; Author  : Andy johnson
+; Date    : 2020/08/28
+;
+; Version : 1.0
+
+; Model-I Calls
+include header.z
+
+
+	org	8000h		; Origin
+
+;Variables
+
+; Coordinates and SET() flag
+XCoord:	ds	1
+YCoord:	ds	1
+
+; Sprite
+; ******
+;*  **  *
+;*  **  *
+; ******
+;
+Sprite:
+	;db 126d,153d,153d,126d,4d,8d
+	db 4d
+	db 8d
+	db 01111110b
+	db 10011001b
+	db 10011001b
+	db 01111110b
+Sprite1:
+	db 3d
+	db 8d
+	db 00011000b
+	db 01100110b
+	db 00011000b
+
+Init:
+	call	Cls		; Clear the screen
+	ld	a,9d
+	ld	(XCoord), a	; save X
+	ld	a,23d
+	ld	(YCoord), a	; save Y
+
+	ld	hl,Sprite
+	ld	ix,Sprite
+
+	call	DrawSprite
+	
+	ld	a,15d
+	ld	(XCoord),a
+	ld	a,15d
+	ld	(YCoord),a
+
+	ld	hl,Sprite1
+	ld	ix,Sprite1
+
+	call	DrawSprite
+
+	ret
+	
+DrawSprite:
+
+	ld	a,(XCoord)
+	ld	e,a
+	ld	d,(ix)	; Load height
+	inc	hl
+	inc	hl
+	
+NextD:
+
+	ld	c,(ix+1)	; Load Width
+	ld	a,e		; Load Starting X
+	ld	(XCoord),a	; Store Starting Coord
+NextC:
+	; if (HL) = 0
+	rlc	(hl)		; roll to carry flag
+	jr	nc,Cont		; if HL=0 then inc a and HL
+
+	push	bc
+	push	de
+	push	hl
+
+	call	Grafix		; if HL=1 then draw and inc a,HL
+	
+	pop	hl
+	pop	de
+	pop	bc
+Cont:
+	ld	a,(XCoord)	; load coord
+	inc	a		; increment
+	ld	(Xcoord),a	; and store
+	dec	c		; decrement C
+	ld	a,0		; If C>0 Next C
+	or	c
+	jr	nz,NextC
+	ld	a,(YCoord)	; If c=0 Next D
+	inc	a
+	ld	(YCoord),a	
+	inc	hl
+	dec	d
+	ld	a,0
+	or	d
+	jr	nz, NextD
+	ret
+
+; Uses SET/RESET to draw based on SET FLAG
+Grafix:
+	ld	a,SetOn		; show the pixel
+	ld	(SetFlg),a	; SET() is on
+	ld	a,(SetFlg)	; Set the SET() flag
+	ld	h,a		; Store in H for SET routine
+	ld	a,(XCoord)	; Set X
+	ld	b,a
+	ld	a,(YCoord)	; Set Y
+
+	; Push these before call (Required by SET)
+	push	hl
+	push	bc
+
+	; Use SET/RESET. HL and BC are parameters
+	ld	hl,SetEnd
+	jp	SetCall
+
+	; Turn set off
+	ld	a,SetOff	; Hide the pixel
+	ld	(SetFlg),a	; SET() is off
+	ret
+
+; End of line
+	end Init

@@ -1,0 +1,17 @@
+
+; header for common calls
+Cls:	equ	01c9h		; Clears the screen
+Screen:	equ	3c00h		; Screen start
+KbScan:	equ	002bh		; Same as INKEY$ (Basic)
+SetXmin:equ	0		; X Coordinate Minimum
+SetXMax:equ	127d		; X Coordinate Maximun (127)
+SetYMin:equ	SetXmin		; Y = X minimum (0) for Set
+SetYMax:equ	44d		; Max is 47 but, save last line
+SetCall:equ	150h		; To be loaded to HL
+SetOn:	equ	80h		; Turn SET() on
+SetOff:	equ	01h		; Turn RESET() on
+SetEnd:	equ	188ch		; RST will call this and find )+
+MsgPos:	equ	3fc0h		; last line
+Delay:	equ	0060h		; Delays for BC*14.65 microseconds
+
+SetFlg:	ds	1
