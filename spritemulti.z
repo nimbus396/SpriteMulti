@@ -33,6 +33,10 @@ Sprite:
 	db 10011001b
 	db 10011001b
 	db 01111110b
+;   **   
+; **  **
+;   **
+
 Sprite1:
 	db 3d
 	db 8d
